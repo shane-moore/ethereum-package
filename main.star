@@ -564,6 +564,10 @@ def run(plan, args={}):
         total_validator_count = 0
         for participant in args_with_right_defaults.participants:
             total_validator_count += participant.validator_count
+        # Must match the builder start index used for the genesis validator set, which
+        # also skips past any preregistered (deposited-but-idle) validator range.
+        if network_params.preregistered_validator_count > total_validator_count:
+            total_validator_count = network_params.preregistered_validator_count
         builder_key_result = plan.run_sh(
             name="derive-builder-bls-key",
             description="Deriving builder BLS private key from mnemonic",

@@ -1687,9 +1687,15 @@ def parse_network_params(plan, input_args):
                     result["network_params"]["gloas_fork_epoch"],
                 )
             )
+        # Builders draw from the same mnemonic as preregistered validators, so they must
+        # start after BOTH the VC-attached range and any preregistered (deposited-but-idle)
+        # range to avoid duplicate pubkeys in the genesis validator set.
+        builder_start_index = actual_num_validators
+        if result["network_params"]["preregistered_validator_count"] > builder_start_index:
+            builder_start_index = result["network_params"]["preregistered_validator_count"]
         builder_mnemonic_entry = {
             "mnemonic": constants.DEFAULT_MNEMONIC,
-            "start": actual_num_validators,
+            "start": builder_start_index,
             "count": result["network_params"]["builder_count"],
             "wd_prefix": "0x03",
             "wd_address": result["network_params"]["withdrawal_address"],
